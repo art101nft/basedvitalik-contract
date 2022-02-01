@@ -1,0 +1,30 @@
+{
+  "name": "vitalik-contract",
+  "version": "1.0.0",
+  "description": "Smart contract for Art101's Based Vitalik NFT project.",
+  "main": "index.js",
+  "scripts": {
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/patrn-me/vitalik-contract.git"
+  },
+  "author": "lza_menace@patrn.me",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/patrn-me/vitalik-contract/issues"
+  },
+  "homepage": "https://github.com/patrn-me/vitalik-contract",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.3.3",
+    "dotenv": "^10.0.0",
+    "truffle": "^5.4.19",
+    "truffle-hdwallet-provider": "^1.0.17",
+    "truffle-plugin-verify": "^0.5.18",
+    "web3": "^1.6.1"
+  },
+  "engines": {
+    "node": "^12.18.x"
+  }
+}
