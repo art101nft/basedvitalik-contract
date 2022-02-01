@@ -8,8 +8,8 @@ module.exports = {
      port: 8545,
      network_id: "*",
     },
-    rinkeby: {
-      provider: () => new HDWalletProvider(process.env.MNEMONIC, "https://rinkeby.infura.io/v3/" + process.env.INFURA_PID),
+    testnet: {
+      provider: () => new HDWalletProvider(process.env.MNEMONIC, "https://ropsten.infura.io/v3/" + process.env.INFURA_PID),
       network_id: 4,
       confirmations: 1,
       timeoutBlocks: 10,

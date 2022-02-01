@@ -21,8 +21,7 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
     bool public mintingIsActive = false;
     bool public reservedVitaliks = false;
     string public baseURI = "";
-    uint256 public preSalePrice = 0.05 ether;
-    uint256 public publicSalePrice = 0.10 ether;
+    uint256 public salePrice = 0.10 ether;
     uint256 public constant maxSupply = 4962;
     uint256 public constant maxMints = 3;
 
@@ -34,13 +33,9 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
         payable(msg.sender).transfer(balance);
     }
 
-    // Update sale prices if needed
-    function setPreSalePrice(uint256 _newPrice) external onlyOwner {
-        preSalePrice = _newPrice;
-    }
-
-    function setPublicSalePrice(uint256 _newPrice) external onlyOwner {
-        publicSalePrice = _newPrice;
+    // Update sale price if needed
+    function setSalePrice(uint256 _newPrice) external onlyOwner {
+        salePrice = _newPrice;
     }
 
     // Flip the minting from active or pause
@@ -105,7 +100,7 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
         }
     }
 
-    // Claim and mint tokens
+    // Purchase and mint
     function mintVitaliks(
       uint256 index,
       address account,
@@ -114,7 +109,7 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
       uint256 numberOfTokens
     ) public payable {
         require(mintingIsActive, "Minting is not active.");
-
+        require(msg.value == amount.mul(salePrice), "Incorrect Ether supplied for the amount of tokens requested.");
         require(totalSupply().add(numberOfTokens) <= maxSupply, "Minting would exceed max supply.");
 
         if (earlyAccessMode) {
