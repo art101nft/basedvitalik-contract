@@ -15,7 +15,7 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
     Counters.Counter private _tokenSupply;
 
     // Define starting contract state
-    bytes32 merkleRoot;
+    bytes32 public merkleRoot;
     bool public merkleSet = false;
     bool public earlyAccessMode = true;
     bool public mintingIsActive = false;
@@ -27,15 +27,15 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
 
     constructor() ERC721("Based Vitalik", "BV") {}
 
+    // Get total supply based upon counter
+    function totalSupply() public view returns (uint256) {
+        return _tokenSupply.current();
+    }
+
     // Withdraw contract balance to creator (mnemonic seed address 0)
     function withdraw() public onlyOwner {
         uint256 balance = address(this).balance;
         payable(msg.sender).transfer(balance);
-    }
-
-    // Update sale price if needed
-    function setSalePrice(uint256 _newPrice) external onlyOwner {
-        salePrice = _newPrice;
     }
 
     // Flip the minting from active or pause
@@ -61,9 +61,9 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
         baseURI = URI;
     }
 
-    // Get total supply based upon counter
-    function totalSupply() public view returns (uint256) {
-        return _tokenSupply.current();
+    // Update sale price if needed
+    function setSalePrice(uint256 _newPrice) external onlyOwner {
+        salePrice = _newPrice;
     }
 
     // Specify a merkle root hash from the gathered k/v dictionary of
@@ -104,19 +104,19 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
     function mintVitaliks(
       uint256 index,
       address account,
-      uint256 amount,
+      uint256 whitelistedAmount,
       bytes32[] calldata merkleProof,
       uint256 numberOfTokens
     ) public payable {
         require(mintingIsActive, "Minting is not active.");
-        require(msg.value == amount.mul(salePrice), "Incorrect Ether supplied for the amount of tokens requested.");
+        require(msg.value == numberOfTokens.mul(salePrice), "Incorrect Ether supplied for the number of tokens requested.");
         require(totalSupply().add(numberOfTokens) <= maxSupply, "Minting would exceed max supply.");
 
         if (earlyAccessMode) {
             require(merkleSet, "Merkle root not set by contract owner.");
             require(msg.sender == account, "Can only be claimed by the whitelisted address.");
             // Verify merkle proof
-            bytes32 node = keccak256(abi.encodePacked(index, account, amount));
+            bytes32 node = keccak256(abi.encodePacked(index, account, whitelistedAmount));
             require(MerkleProof.verify(merkleProof, merkleRoot, node), "Invalid merkle proof.");
         } else {
             require(numberOfTokens <= maxMints, "Cannot mint more than 3 per tx during public sale.");
