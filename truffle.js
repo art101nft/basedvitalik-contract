@@ -10,7 +10,7 @@ module.exports = {
     },
     testnet: {
       provider: () => new HDWalletProvider(process.env.MNEMONIC, "https://ropsten.infura.io/v3/" + process.env.INFURA_PID),
-      network_id: 4,
+      network_id: 3,
       confirmations: 1,
       timeoutBlocks: 10,
       skipDryRun: true,
