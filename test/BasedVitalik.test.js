@@ -108,6 +108,8 @@ contract('BasedVitalik', function ([owner, other]) {
   });
 
   it('reserve func works once and mints 40 to owner', async function () {
+    const _gas1 = await this.bv.reserveVitaliks.estimateGas();
+    console.log(_gas1);
     await this.bv.reserveVitaliks();
     await expect(
       (await this.bv.totalSupply()).toString()
@@ -119,15 +121,21 @@ contract('BasedVitalik', function ([owner, other]) {
     await expect(
       (await this.bv.totalSupply()).toString()
     ).to.equal('40');
-  })
+    const _gas2 = await this.bv.reserveVitaliks.estimateGas();
+    console.log(_gas2);
+  });
 
   // it('early access mode w/ merkle root hash allows whitelist minting', async function () {
   //   const _val = new BN('0100000000000000000');
-  //   const leaf1 = abi.rawEncode(
+  //   const leaf1 = abi.soliditySHA3(
   //     [ "uint", "address", "uint"],
   //     [ 1, other, 5 ]
-  //   )
-  //   const leaves = ['0x' + leaf1, 2].map(v => keccak256(v));
+  //   ).toString('hex');
+  //   const leaf2 = abi.soliditySHA3(
+  //     [ "uint", "address", "uint"],
+  //     [ 2, owner, 3 ]
+  //   ).toString('hex');
+  //   const leaves = [leaf1, leaf2].map(v => keccak256(v));
   //   const tree = new MerkleTree(leaves, keccak256, { sort: true });
   //   const root = tree.getHexRoot();
   //   const leaf = keccak256(leaf1);
@@ -138,7 +146,38 @@ contract('BasedVitalik', function ([owner, other]) {
   //   await expect(
   //     (await this.bv.totalSupply()).toString()
   //   ).to.equal('1');
-  // })
+  // });
+
+  it('minting works', async function () {
+    const _buy1 = new BN('0100000000000000000');
+    const _buy2 = new BN('0200000000000000000');
+    const _buy3 = new BN('0300000000000000000');
+    const _buy10 = new BN('1000000000000000000');
+    await this.bv.toggleMinting();
+    await this.bv.toggleEarlyAccessMode();
+    const _gas1 = await this.bv.mintVitaliks.estimateGas(0, other, 0, [], 1, {value: _buy1, from: other});
+    const _gas2 = await this.bv.mintVitaliks.estimateGas(0, other, 0, [], 2, {value: _buy2, from: other});
+    const _gas3 = await this.bv.mintVitaliks.estimateGas(0, other, 0, [], 3, {value: _buy3, from: other});
+    console.log(_gas1);
+    console.log(_gas2);
+    console.log(_gas3);
+    await this.bv.mintVitaliks(0, other, 0, [], 1, {value: _buy1, from: other});
+    await expect(
+      (await this.bv.totalSupply()).toString()
+    ).to.equal('1');
+    await this.bv.mintVitaliks(0, other, 0, [], 2, {value: _buy2, from: other});
+    await expect(
+      (await this.bv.totalSupply()).toString()
+    ).to.equal('3');
+    await expectRevert(
+      this.bv.mintVitaliks(0, other, 0, [], 4, {value: _buy10, from: other}),
+      'Incorrect Ether supplied for the number of tokens requested.',
+    );
+    await expectRevert(
+      this.bv.mintVitaliks(0, other, 0, [], 10, {value: _buy10, from: other}),
+      'Cannot mint more than 3 per tx during public sale.',
+    );
+  });
 
 
 });
