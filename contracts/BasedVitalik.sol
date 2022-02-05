@@ -118,6 +118,7 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
             // Verify merkle proof
             bytes32 node = keccak256(abi.encodePacked(index, account, whitelistedAmount));
             require(MerkleProof.verify(merkleProof, merkleRoot, node), "Invalid merkle proof.");
+            require(balanceOf(msg.sender).add(numberOfTokens) <= whitelistedAmount, "Cannot exceed amount whitelisted during early access mode.");
         } else {
             require(numberOfTokens <= maxMints, "Cannot mint more than 3 per tx during public sale.");
         }
