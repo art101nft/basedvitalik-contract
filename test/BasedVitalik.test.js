@@ -175,7 +175,7 @@ contract('BasedVitalik', function ([owner, other]) {
     );
     await expectRevert(
       this.bv.mintVitaliks(0, other, 0, [], 10, {value: _buy10, from: other}),
-      'Cannot mint more than 3 per tx during public sale.',
+      'Cannot mint more than 5 per tx during public sale.',
     );
   });
 

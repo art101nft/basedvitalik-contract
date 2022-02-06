@@ -23,7 +23,7 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
     string public baseURI = "";
     uint256 public salePrice = 0.10 ether;
     uint256 public constant maxSupply = 4962;
-    uint256 public constant maxMints = 3;
+    uint256 public constant maxMints = 5;
 
     constructor() ERC721("Based Vitalik", "BV") {}
 
@@ -120,7 +120,7 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
             require(MerkleProof.verify(merkleProof, merkleRoot, node), "Invalid merkle proof.");
             require(balanceOf(msg.sender).add(numberOfTokens) <= whitelistedAmount, "Cannot exceed amount whitelisted during early access mode.");
         } else {
-            require(numberOfTokens <= maxMints, "Cannot mint more than 3 per tx during public sale.");
+            require(numberOfTokens <= maxMints, "Cannot mint more than 5 per tx during public sale.");
         }
 
         _mintVitaliks(numberOfTokens);
