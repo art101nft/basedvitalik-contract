@@ -1,16 +1,43 @@
 // test/BasedVitalik.test.js
+const fs = require('fs');
+const { execSync } = require("child_process");
 const { expect } = require('chai');
 const { BN, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 const BasedVitalik = artifacts.require('BasedVitalik');
-const { MerkleTree } = require('merkletreejs');
-const abi = require('ethereumjs-abi');
-const keccak256 = require('keccak256');
 
-// Start test block
-contract('BasedVitalik', function ([owner, other]) {
+contract('BasedVitalik', function ([owner, other, other2]) {
+
+  let addresses;
+  let proofs;
+  before(async function () {
+    let addressesWhitelist = new Object();
+    addressesWhitelist[other] = "20";
+    addressesWhitelist[other2] = "20";
+
+    fs.writeFileSync(
+      "./output.json",
+      JSON.stringify(addressesWhitelist),
+      "utf8"
+    );
+
+    execSync(
+      `go-merkle-distributor --json-file=output.json --output-file=proofs.json`,
+      {
+        stdio: "inherit",
+      }
+    );
+
+    proofs = JSON.parse(fs.readFileSync("proofs.json", "utf8"));
+    addresses = Object.keys(proofs);
+  });
 
   beforeEach(async function () {
     this.bv = await BasedVitalik.new({from: owner});
+  });
+
+  after(() => {
+    fs.unlinkSync("proofs.json");
+    fs.unlinkSync("output.json");
   });
 
   it('sales are paused and early access mode is on by default', async function () {
@@ -108,8 +135,6 @@ contract('BasedVitalik', function ([owner, other]) {
   });
 
   it('reserve func works once and mints 40 to owner', async function () {
-    const _gas1 = await this.bv.reserveVitaliks.estimateGas();
-    console.log(_gas1);
     await this.bv.reserveVitaliks();
     await expect(
       (await this.bv.totalSupply()).toString()
@@ -121,32 +146,28 @@ contract('BasedVitalik', function ([owner, other]) {
     await expect(
       (await this.bv.totalSupply()).toString()
     ).to.equal('40');
-    const _gas2 = await this.bv.reserveVitaliks.estimateGas();
-    console.log(_gas2);
   });
 
-  // it('early access mode w/ merkle root hash allows whitelist minting', async function () {
-  //   const _val = new BN('0100000000000000000');
-  //   const leaf1 = abi.soliditySHA3(
-  //     [ "uint", "address", "uint"],
-  //     [ 1, other, 5 ]
-  //   ).toString('hex');
-  //   const leaf2 = abi.soliditySHA3(
-  //     [ "uint", "address", "uint"],
-  //     [ 2, owner, 3 ]
-  //   ).toString('hex');
-  //   const leaves = [leaf1, leaf2].map(v => keccak256(v));
-  //   const tree = new MerkleTree(leaves, keccak256, { sort: true });
-  //   const root = tree.getHexRoot();
-  //   const leaf = keccak256(leaf1);
-  //   const proof = tree.getHexProof(leaf);
-  //   await this.bv.setMerkleRoot(root);
-  //   await this.bv.toggleMinting();
-  //   await this.bv.mintVitaliks(1, other, 5, proof, 1, {value: _val, from: other});
-  //   await expect(
-  //     (await this.bv.totalSupply()).toString()
-  //   ).to.equal('1');
-  // });
+  it('early access mode w/ merkle root hash allows whitelist minting', async function () {
+    const _val = new BN('1000000000000000000');
+    let root = proofs.root.Proof[0];
+    await this.bv.setMerkleRoot(root);
+    await this.bv.toggleMinting();
+    await this.bv.mintVitaliks(
+      proofs[other].Index,
+      other,
+      proofs[other].Amount,
+      proofs[other].Proof,
+      10, {value: _val, from: other}
+    );
+    await expect(
+      (await this.bv.totalSupply()).toString()
+    ).to.equal('10');
+    await expectRevert(
+      this.bv.mintVitaliks(0, owner, 0, [], 10, {value: _val, from: owner}),
+      'Invalid merkle proof.',
+    );
+  });
 
   it('minting works', async function () {
     const _buy1 = new BN('0100000000000000000');
@@ -155,12 +176,6 @@ contract('BasedVitalik', function ([owner, other]) {
     const _buy10 = new BN('1000000000000000000');
     await this.bv.toggleMinting();
     await this.bv.toggleEarlyAccessMode();
-    const _gas1 = await this.bv.mintVitaliks.estimateGas(0, other, 0, [], 1, {value: _buy1, from: other});
-    const _gas2 = await this.bv.mintVitaliks.estimateGas(0, other, 0, [], 2, {value: _buy2, from: other});
-    const _gas3 = await this.bv.mintVitaliks.estimateGas(0, other, 0, [], 3, {value: _buy3, from: other});
-    console.log(_gas1);
-    console.log(_gas2);
-    console.log(_gas3);
     await this.bv.mintVitaliks(0, other, 0, [], 1, {value: _buy1, from: other});
     await expect(
       (await this.bv.totalSupply()).toString()
