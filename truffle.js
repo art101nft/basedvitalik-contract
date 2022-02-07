@@ -15,6 +15,7 @@ module.exports = {
       timeoutBlocks: 10,
       skipDryRun: true,
       production: false,
+      gas: 2500000
     },
     mainnet: {
       provider: () => new HDWalletProvider(process.env.MNEMONIC, "https://mainnet.infura.io/v3/" + process.env.INFURA_PID),
@@ -23,6 +24,7 @@ module.exports = {
       timeoutBlocks: 30,
       skipDryRun: false,
       production: true,
+      gas: 2500000,
       gasPrice: 150000000000 // 150 gwei
     },
   },
