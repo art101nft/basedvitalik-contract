@@ -9,8 +9,8 @@ module.exports = {
      network_id: "*",
     },
     testnet: {
-      provider: () => new HDWalletProvider(process.env.MNEMONIC, "https://ropsten.infura.io/v3/" + process.env.INFURA_PID),
-      network_id: 3,
+      provider: () => new HDWalletProvider(process.env.MNEMONIC, "https://rinkeby.infura.io/v3/" + process.env.INFURA_PID),
+      network_id: 4,
       confirmations: 1,
       timeoutBlocks: 10,
       skipDryRun: true,
