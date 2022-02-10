@@ -9,10 +9,23 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 
+/**
+ * Used to delegate ownership of a contract to another address,
+ * to save on unneeded transactions to approve contract use for users
+ */
+contract OwnableDelegateProxy {}
+
+contract ProxyRegistry {
+    mapping(address => OwnableDelegateProxy) public proxies;
+}
+
 contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
     using SafeMath for uint256;
     using Counters for Counters.Counter;
     Counters.Counter private _tokenSupply;
+
+    // Keep mapping of proxy accounts for easy listing
+    mapping(address => bool) public proxyApproved;
 
     // Define starting contract state
     bytes32 public merkleRoot;
@@ -24,8 +37,11 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
     uint256 public salePrice = 0.10 ether;
     uint256 public constant maxSupply = 4962;
     uint256 public constant maxMints = 5;
+    address public immutable proxyRegistryAddress;
 
-    constructor() ERC721("Based Vitalik", "BV") {}
+    constructor(address _proxyRegistryAddress) ERC721("Based Vitalik", "BV") {
+        proxyRegistryAddress = _proxyRegistryAddress;
+    }
 
     // Get total supply based upon counter
     function totalSupply() public view returns (uint256) {
@@ -54,6 +70,11 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
         } else {
             earlyAccessMode = true;
         }
+    }
+
+    // Flip the proxy approval state
+    function toggleProxyState(address proxyAddress) public onlyOwner {
+        proxyApproved[proxyAddress] = !proxyApproved[proxyAddress];
     }
 
     // Specify a new IPFS URI for metadata
@@ -146,16 +167,16 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
 
     function isApprovedForAll(address _owner, address _operator)
         public
-        override
         view
-        returns (bool isOperator) 
+        override
+        returns (bool isOperator)
     {
-        // if OpenSea's ERC721 Proxy Address is detected, auto-return true
-        if (_operator == address(0x58807baD0B376efc12F5AD86aAc70E78ed67deaE)) {
+        // Whitelist proxy contracts for easy trading.
+        ProxyRegistry proxyRegistry = ProxyRegistry(proxyRegistryAddress);
+        if (address(proxyRegistry.proxies(_owner)) == _operator || proxyApproved[_operator]) {
             return true;
         }
 
-        // otherwise, use the default ERC721.isApprovedForAll()
-        return ERC721.isApprovedForAll(_owner, _operator);
+        return super.isApprovedForAll(_owner, _operator);
     }
 }
