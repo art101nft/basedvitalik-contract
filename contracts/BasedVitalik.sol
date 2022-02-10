@@ -34,6 +34,7 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
     bool public mintingIsActive = false;
     bool public reservedVitaliks = false;
     string public baseURI = "";
+    string public _contractURI = "";
     uint256 public salePrice = 0.10 ether;
     uint256 public constant maxSupply = 4962;
     uint256 public constant maxMints = 5;
@@ -46,6 +47,11 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
     // Get total supply based upon counter
     function totalSupply() public view returns (uint256) {
         return _tokenSupply.current();
+    }
+
+    // Show contract URI
+    function contractURI() public view returns (string memory) {
+        return _contractURI;
     }
 
     // Withdraw contract balance to creator (mnemonic seed address 0)
@@ -80,6 +86,11 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
     // Specify a new IPFS URI for metadata
     function setBaseURI(string memory URI) public onlyOwner {
         baseURI = URI;
+    }
+
+    // Specify a new contract URI
+    function setContractURI(string memory URI) public onlyOwner {
+        _contractURI = URI;
     }
 
     // Update sale price if needed
