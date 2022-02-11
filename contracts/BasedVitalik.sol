@@ -55,7 +55,7 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
     }
 
     // Withdraw contract balance to creator (mnemonic seed address 0)
-    function withdraw() public onlyOwner {
+    function withdraw() external onlyOwner {
         uint256 balance = address(this).balance;
         payable(msg.sender).transfer(balance);
     }
@@ -79,17 +79,17 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
     }
 
     // Flip the proxy approval state
-    function toggleProxyState(address proxyAddress) public onlyOwner {
+    function toggleProxyState(address proxyAddress) external onlyOwner {
         proxyApproved[proxyAddress] = !proxyApproved[proxyAddress];
     }
 
     // Specify a new IPFS URI for metadata
-    function setBaseURI(string memory URI) public onlyOwner {
+    function setBaseURI(string memory URI) external onlyOwner {
         baseURI = URI;
     }
 
     // Specify a new contract URI
-    function setContractURI(string memory URI) public onlyOwner {
+    function setContractURI(string memory URI) external onlyOwner {
         _contractURI = URI;
     }
 
@@ -107,7 +107,7 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
     }
 
     // Reserve some vitaliks for giveaways
-    function reserveVitaliks() public onlyOwner {
+    function reserveVitaliks() external onlyOwner {
         // Only allow one-time reservation of 40 tokens
         if (!reservedVitaliks) {
             _mintVitaliks(40);
@@ -139,7 +139,7 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
       uint256 whitelistedAmount,
       bytes32[] calldata merkleProof,
       uint256 numberOfTokens
-    ) public payable {
+    ) external payable {
         require(mintingIsActive, "Minting is not active.");
         require(msg.value == numberOfTokens.mul(salePrice), "Incorrect Ether supplied for the number of tokens requested.");
         require(totalSupply().add(numberOfTokens) <= maxSupply, "Minting would exceed max supply.");
