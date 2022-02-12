@@ -2,8 +2,8 @@ module.exports = async function main(callback) {
   try {
     const BasedVitalik = artifacts.require("BasedVitalik");
     const contract = await BasedVitalik.deployed();
-    console.log(`contract address: ${contract.address}`);
-    console.log(`baseURI: ${await contract.baseURI()}`);
+    await contract.reserveVitaliks();
+    console.log(`[+] Minted reserved Vitaliks to contract deployer`);
     callback(0);
   } catch (error) {
     console.error(error);

@@ -33,12 +33,12 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
     bool public earlyAccessMode = true;
     bool public mintingIsActive = false;
     bool public reservedVitaliks = false;
-    string public baseURI = "";
-    string public _contractURI = "";
-    uint256 public salePrice = 0.10 ether;
+    uint256 public salePrice = 0.03 ether;
     uint256 public constant maxSupply = 4962;
     uint256 public constant maxMints = 5;
     address public immutable proxyRegistryAddress;
+    string public baseURI;
+    string public _contractURI;
 
     constructor(address _proxyRegistryAddress) ERC721("Based Vitalik", "BV") {
         proxyRegistryAddress = _proxyRegistryAddress;

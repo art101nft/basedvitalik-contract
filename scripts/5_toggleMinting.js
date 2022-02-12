@@ -6,9 +6,9 @@ module.exports = async function main(callback) {
     console.log(`[+] Toggling mintingIsActive. Currently: ${mintingIsActive}`);
     await contract.toggleMinting();
     if (mintingIsActive) {
-      console.log(`Minting disabled!`);
+      console.log(`[+] Minting disabled!`);
     } else {
-      console.log(`Minting enabled!`);
+      console.log(`[+] Minting enabled!`);
     }
     callback(0);
   } catch (error) {

@@ -6,10 +6,10 @@ module.exports = async function main(callback) {
     console.log(`[+] Toggling earlyAccessMode. Currently: ${earlyAccessMode}`);
     if (earlyAccessMode) {
       await contract.toggleEarlyAccessMode();
-      console.log(`Early access mode disabled!`);
+      console.log(`[+] Early access mode disabled!`);
     } else {
       await contract.toggleEarlyAccessMode();
-      console.log(`Early access mode enabled!`);
+      console.log(`[+] Early access mode enabled!`);
     }
     callback(0);
   } catch (error) {
