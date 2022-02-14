@@ -32,7 +32,7 @@ contract('BasedVitalik', function ([owner, other, other2]) {
   });
 
   beforeEach(async function () {
-    this.bv = await BasedVitalik.new({from: owner});
+    this.bv = await BasedVitalik.new("0xf57b2c51ded3a29e6891aba85459d600256cf317", {from: owner});
   });
 
   after(() => {
@@ -149,7 +149,7 @@ contract('BasedVitalik', function ([owner, other, other2]) {
   });
 
   it('early access mode w/ merkle root hash allows whitelist minting', async function () {
-    const _val = new BN('1000000000000000000');
+    const _val = new BN('30000000000000000');
     let root = proofs.root.Proof[0];
     await this.bv.setMerkleRoot(root);
     await this.bv.toggleMinting();
@@ -158,22 +158,22 @@ contract('BasedVitalik', function ([owner, other, other2]) {
       other,
       proofs[other].Amount,
       proofs[other].Proof,
-      10, {value: _val, from: other}
+      1, {value: _val, from: other}
     );
     await expect(
       (await this.bv.totalSupply()).toString()
-    ).to.equal('10');
+    ).to.equal('1');
     await expectRevert(
-      this.bv.mintVitaliks(0, owner, 0, [], 10, {value: _val, from: owner}),
+      this.bv.mintVitaliks(0, owner, 0, [], 1, {value: _val, from: owner}),
       'Invalid merkle proof.',
     );
   });
 
   it('minting works', async function () {
-    const _buy1 = new BN('0100000000000000000');
-    const _buy2 = new BN('0200000000000000000');
-    const _buy3 = new BN('0300000000000000000');
-    const _buy10 = new BN('1000000000000000000');
+    const _buy1 = new BN('30000000000000000');
+    const _buy2 = new BN('60000000000000000');
+    const _buy3 = new BN('90000000000000000');
+    const _buy10 = new BN('300000000000000000');
     await this.bv.toggleMinting();
     await this.bv.toggleEarlyAccessMode();
     await this.bv.mintVitaliks(0, other, 0, [], 1, {value: _buy1, from: other});
