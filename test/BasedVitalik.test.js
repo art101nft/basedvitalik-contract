@@ -109,7 +109,7 @@ contract('BasedVitalik', function ([owner, other, other2]) {
 
   it('set funcs work', async function () {
     // setBaseURI function will set new metadata URI for NFTs
-    const _hash = 'ipfs://mynewhash';
+    const _hash = 'ipfs://mynewhash/';
     await this.bv.setBaseURI(_hash);
     await expect(
       await this.bv.tokenURI(1)
