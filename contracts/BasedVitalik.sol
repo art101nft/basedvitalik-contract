@@ -1,13 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-/* import "@openzeppelin/contracts/token/ERC721/ERC721.sol"; */
-/* import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol"; */
+import "erc721a/contracts/ERC721A.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
-import "erc721a/contracts/ERC721A.sol";
 
 
 /**
@@ -22,7 +19,6 @@ contract ProxyRegistry {
 
 contract BasedVitalik is ERC721A, Ownable {
     using SafeMath for uint256;
-    using Counters for Counters.Counter;
 
     // Keep mapping of proxy accounts for easy listing
     mapping(address => bool) public proxyApproved;
@@ -149,8 +145,11 @@ contract BasedVitalik is ERC721A, Ownable {
         _mintVitaliks(numberOfTokens);
     }
 
-    // Override the below functions from parent contracts
+    /*
+     * Override the below functions from parent contracts
+     */
 
+    // Always return tokenURI, even if token doesn't exist yet
     function tokenURI(uint256 tokenId)
         public
         view
@@ -160,20 +159,13 @@ contract BasedVitalik is ERC721A, Ownable {
         return string(abi.encodePacked(baseURI, Strings.toString(tokenId)));
     }
 
-    /* function _burn(uint256 tokenId)
-        internal
-        override(ERC721, ERC721URIStorage)
-    {
-        super._burn(tokenId);
-    } */
-
+    // Whitelist proxy contracts for easy trading on platforms (Opensea is default)
     function isApprovedForAll(address _owner, address _operator)
         public
         view
         override
         returns (bool isOperator)
     {
-        // Whitelist proxy contracts for easy trading.
         ProxyRegistry proxyRegistry = ProxyRegistry(proxyRegistryAddress);
         if (address(proxyRegistry.proxies(_owner)) == _operator || proxyApproved[_operator]) {
             return true;
