@@ -11,7 +11,7 @@ contract('BasedVitalik', function ([owner, other, other2]) {
   let proofs;
   before(async function () {
     let addressesWhitelist = new Object();
-    addressesWhitelist[other] = "20";
+    addressesWhitelist[other] = "100";
     addressesWhitelist[other2] = "20";
 
     fs.writeFileSync(
@@ -156,6 +156,7 @@ contract('BasedVitalik', function ([owner, other, other2]) {
     const _val2 = new BN('60000000000000000');
     const _val10 = new BN('300000000000000000');
     const _val20 = new BN('600000000000000000');
+    const _val70 = new BN('2100000000000000000');
     let root = proofs.root.Proof[0];
     await this.bv.setMerkleRoot(root);
     await this.bv.toggleMinting();
@@ -195,6 +196,15 @@ contract('BasedVitalik', function ([owner, other, other2]) {
     );
     const _gasEth20 = web3.utils.fromWei(web3.utils.toWei(new BN(_gas20.toString()), 'gwei'), 'ether');
     console.log(`[+] Estimates show minting 20 during early access mode (w/ merkle proof validation) will require ${_gas20} gas. At 150 gwei this transaction would cost ${_gasEth20 * 150} ETH`);
+    const _gas70 = await this.bv.mintVitaliks.estimateGas(
+      proofs[other].Index,
+      other,
+      proofs[other].Amount,
+      proofs[other].Proof,
+      70, {value: _val70, from: other}
+    );
+    const _gasEth70 = web3.utils.fromWei(web3.utils.toWei(new BN(_gas70.toString()), 'gwei'), 'ether');
+    console.log(`[+] Estimates show minting 70 during early access mode (w/ merkle proof validation) will require ${_gas70} gas. At 150 gwei this transaction would cost ${_gasEth70 * 150} ETH`);
     await this.bv.mintVitaliks(
       proofs[other].Index,
       other,
