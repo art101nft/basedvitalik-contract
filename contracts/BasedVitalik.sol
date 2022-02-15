@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+/* import "@openzeppelin/contracts/token/ERC721/ERC721.sol"; */
+/* import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol"; */
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import "erc721a/contracts/ERC721A.sol";
 
 
 /**
@@ -19,10 +20,9 @@ contract ProxyRegistry {
     mapping(address => OwnableDelegateProxy) public proxies;
 }
 
-contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
+contract BasedVitalik is ERC721A, Ownable {
     using SafeMath for uint256;
     using Counters for Counters.Counter;
-    Counters.Counter private _tokenSupply;
 
     // Keep mapping of proxy accounts for easy listing
     mapping(address => bool) public proxyApproved;
@@ -40,13 +40,8 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
     string public baseURI;
     string public _contractURI;
 
-    constructor(address _proxyRegistryAddress) ERC721("Based Vitalik", "BV") {
+    constructor(address _proxyRegistryAddress) ERC721A("Based Vitalik", "BV") {
         proxyRegistryAddress = _proxyRegistryAddress;
-    }
-
-    // Get total supply based upon counter
-    function totalSupply() public view returns (uint256) {
-        return _tokenSupply.current();
     }
 
     // Show contract URI
@@ -119,12 +114,8 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
     function _mintVitaliks(uint256 numberOfTokens) private {
         require(numberOfTokens > 0, "Must mint at least 1 token");
 
-        // Mint i tokens where i is specified by function invoker
-        for(uint256 i = 0; i < numberOfTokens; i++) {
-            uint256 tokenId = totalSupply() + 1; // Start at 1
-            _safeMint(msg.sender, tokenId);
-            _tokenSupply.increment();
-        }
+        // Mint number of tokens requested
+        _safeMint(msg.sender, numberOfTokens);
 
         // Disable minting if max supply of tokens is reached
         if (totalSupply() == maxSupply) {
@@ -163,18 +154,18 @@ contract BasedVitalik is ERC721, ERC721URIStorage, Ownable {
     function tokenURI(uint256 tokenId)
         public
         view
-        override(ERC721, ERC721URIStorage)
+        override(ERC721A)
         returns (string memory)
     {
         return string(abi.encodePacked(baseURI, Strings.toString(tokenId)));
     }
 
-    function _burn(uint256 tokenId)
+    /* function _burn(uint256 tokenId)
         internal
         override(ERC721, ERC721URIStorage)
     {
         super._burn(tokenId);
-    }
+    } */
 
     function isApprovedForAll(address _owner, address _operator)
         public
