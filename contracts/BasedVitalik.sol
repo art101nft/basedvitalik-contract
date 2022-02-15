@@ -53,20 +53,12 @@ contract BasedVitalik is ERC721A, Ownable {
 
     // Flip the minting from active or pause
     function toggleMinting() external onlyOwner {
-        if (mintingIsActive) {
-            mintingIsActive = false;
-        } else {
-            mintingIsActive = true;
-        }
+        mintingIsActive = !mintingIsActive;
     }
 
     // Flip the early access mode to allow/disallow public minting vs whitelist minting
     function toggleEarlyAccessMode() external onlyOwner {
-        if (earlyAccessMode) {
-            earlyAccessMode = false;
-        } else {
-            earlyAccessMode = true;
-        }
+        earlyAccessMode = !earlyAccessMode;
     }
 
     // Flip the proxy approval state
