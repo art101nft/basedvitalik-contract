@@ -135,10 +135,10 @@ contract('BasedVitalik', function ([owner, other, other2]) {
   });
 
   it('reserve func works once and mints 40 to owner', async function () {
-    await this.bv.reserveVitaliks();
     const _gas = await this.bv.reserveVitaliks.estimateGas();
     const _gasEth = web3.utils.fromWei(web3.utils.toWei(new BN(_gas.toString()), 'gwei'), 'ether');
     console.log(`[+] Estimates show reserving 40 vitaliks will require ${_gas} gas. At 150 gwei this transaction would cost ${_gasEth * 150} ETH`);
+    await this.bv.reserveVitaliks();
     await expect(
       (await this.bv.totalSupply()).toString()
     ).to.equal('40');

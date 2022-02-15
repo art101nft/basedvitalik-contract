@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.11;
 
 import "erc721a/contracts/ERC721A.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -163,7 +163,7 @@ contract BasedVitalik is ERC721A, Ownable {
     function isApprovedForAll(address _owner, address _operator)
         public
         view
-        override
+        override(ERC721A)
         returns (bool isOperator)
     {
         ProxyRegistry proxyRegistry = ProxyRegistry(proxyRegistryAddress);
