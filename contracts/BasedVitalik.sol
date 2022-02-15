@@ -31,7 +31,7 @@ contract BasedVitalik is ERC721A, Ownable {
     bool public reservedVitaliks = false;
     uint256 public salePrice = 0.03 ether;
     uint256 public constant maxSupply = 4962;
-    uint256 public constant maxMints = 5;
+    uint256 public constant maxMints = 30;
     address public immutable proxyRegistryAddress;
     string public baseURI;
     string public _contractURI;
@@ -131,7 +131,7 @@ contract BasedVitalik is ERC721A, Ownable {
             require(MerkleProof.verify(merkleProof, merkleRoot, node), "Invalid merkle proof.");
             require(balanceOf(msg.sender).add(numberOfTokens) <= whitelistedAmount, "Cannot exceed amount whitelisted during early access mode.");
         } else {
-            require(numberOfTokens <= maxMints, "Cannot mint more than 5 per tx during public sale.");
+            require(numberOfTokens <= maxMints, "Cannot mint more than 30 per tx during public sale.");
         }
 
         _mintVitaliks(numberOfTokens);

@@ -217,6 +217,7 @@ contract('BasedVitalik', function ([owner, other, other2]) {
     const _buy3 = new BN('90000000000000000');
     const _buy5 = new BN('150000000000000000');
     const _buy6 = new BN('180000000000000000');
+    const _buy31 = new BN('930000000000000000');
     await this.bv.toggleMinting();
     await this.bv.toggleEarlyAccessMode();
     const _gas1 = await this.bv.mintVitaliks.estimateGas(0, other, 0, [], 1, {value: _buy1, from: other});
@@ -244,8 +245,8 @@ contract('BasedVitalik', function ([owner, other, other2]) {
       'Incorrect Ether supplied for the number of tokens requested.',
     );
     await expectRevert(
-      this.bv.mintVitaliks(0, other, 0, [], 6, {value: _buy6, from: other}),
-      'Cannot mint more than 5 per tx during public sale.',
+      this.bv.mintVitaliks(0, other, 0, [], 31, {value: _buy31, from: other}),
+      'Cannot mint more than 30 per tx during public sale.',
     );
   });
 
