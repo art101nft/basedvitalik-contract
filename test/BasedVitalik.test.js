@@ -281,9 +281,11 @@ contract('BasedVitalik', function ([owner, other, other2]) {
       await this.bv.earlyAccessMode()
     ).to.equal(false);
     // Mint all 4962
-    for (i = 0; i < 827; i++) {
-      await this.bv.mintVitaliks(0, other, 0, [], 6, {value: _buy6, from: other});
+    for (i = 0; i < 165; i++) {
+      await this.bv.mintVitaliks(0, other, 0, [], 30, {value: _buy30, from: other});
     }
+    await this.bv.mintVitaliks(0, other, 0, [], 6, {value: _buy6, from: other});
+    await this.bv.mintVitaliks(0, other, 0, [], 6, {value: _buy6, from: other});
     await expect(
       (await this.bv.totalSupply()).toString()
     ).to.equal('4962');
