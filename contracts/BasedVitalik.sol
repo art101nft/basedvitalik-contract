@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 import "erc721a/contracts/ERC721A.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -29,6 +29,7 @@ contract BasedVitalik is ERC721A, Ownable {
     bool public earlyAccessMode = true;
     bool public mintingIsActive = false;
     bool public reservedVitaliks = false;
+    bool public placeholderMeta = true;
     uint256 public salePrice = 0.03 ether;
     uint256 public constant maxSupply = 4962;
     uint256 public constant maxMints = 30;
@@ -59,6 +60,11 @@ contract BasedVitalik is ERC721A, Ownable {
     // Flip the early access mode to allow/disallow public minting vs whitelist minting
     function toggleEarlyAccessMode() external onlyOwner {
         earlyAccessMode = !earlyAccessMode;
+    }
+
+    // Flip the placeholder metadata URI to global or per token
+    function togglePlaceholder() external onlyOwner {
+        placeholderMeta = !placeholderMeta;
     }
 
     // Flip the proxy approval state
@@ -148,7 +154,11 @@ contract BasedVitalik is ERC721A, Ownable {
         override(ERC721A)
         returns (string memory)
     {
-        return string(abi.encodePacked(baseURI, Strings.toString(tokenId)));
+        if (placeholderMeta) {
+            return string(abi.encodePacked(baseURI));
+        } else {
+            return string(abi.encodePacked(baseURI, Strings.toString(tokenId)));
+        }
     }
 
     // Whitelist proxy contracts for easy trading on platforms (Opensea is default)

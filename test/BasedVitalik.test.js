@@ -57,6 +57,9 @@ contract('BasedVitalik', function ([owner, other, other2]) {
     await expect(
       await this.bv.earlyAccessMode()
     ).to.equal(true);
+    await expect(
+      await this.bv.placeholderMeta()
+    ).to.equal(true);
   });
 
   it('ownership required for key functions', async function () {
@@ -74,6 +77,10 @@ contract('BasedVitalik', function ([owner, other, other2]) {
     );
     await expectRevert(
       this.bv.toggleEarlyAccessMode({from: other}),
+      'Ownable: caller is not the owner',
+    );
+    await expectRevert(
+      this.bv.togglePlaceholder({from: other}),
       'Ownable: caller is not the owner',
     );
     await expectRevert(
@@ -115,12 +122,28 @@ contract('BasedVitalik', function ([owner, other, other2]) {
     await expect(
       await this.bv.earlyAccessMode()
     ).to.equal(true);
+    // togglePlaceholder function toggles placeholderMeta var
+    await expect(
+      await this.bv.placeholderMeta()
+    ).to.equal(true);
+    await this.bv.togglePlaceholder();
+    await expect(
+      await this.bv.placeholderMeta()
+    ).to.equal(false);
+    await this.bv.togglePlaceholder();
+    await expect(
+      await this.bv.placeholderMeta()
+    ).to.equal(true);
   });
 
   it('set funcs work', async function () {
     // setBaseURI function will set new metadata URI for NFTs
     const _hash = 'ipfs://mynewhash/';
     await this.bv.setBaseURI(_hash);
+    await expect(
+      await this.bv.tokenURI(1)
+    ).to.equal(_hash);
+    await this.bv.togglePlaceholder();
     await expect(
       await this.bv.tokenURI(1)
     ).to.equal(_hash + '1');
