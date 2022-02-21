@@ -2,7 +2,6 @@ module.exports = async function main(callback) {
   try {
     const BasedVitalik = artifacts.require("BasedVitalik");
     const contract = await BasedVitalik.deployed();
-    await contract.withdraw();
     const merkleSet = await contract.merkleSet();
     const earlyAccessMode = await contract.earlyAccessMode();
     const mintingIsActive = await contract.mintingIsActive();
