@@ -16,6 +16,7 @@ module.exports = async function main(callback) {
     const tokenURI = await contract.tokenURI(1);
     const _contractURI = await contract._contractURI();
     console.log(`[+] Mint info:`)
+    console.log(`- contractAddress: ${contract.address}`);
     console.log(`- merkleSet: ${merkleSet}`);
     console.log(`- earlyAccessMode: ${earlyAccessMode}`);
     console.log(`- mintingIsActive: ${mintingIsActive}`);
