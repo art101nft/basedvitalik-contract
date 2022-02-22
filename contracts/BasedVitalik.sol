@@ -23,6 +23,9 @@ contract BasedVitalik is ERC721A, Ownable {
     // Keep mapping of proxy accounts for easy listing
     mapping(address => bool) public proxyApproved;
 
+    // Keep mapping of whitelist mints to prevent abuse
+    mapping(address => uint256) public earlyAccessMinted;
+
     // Define starting contract state
     bytes32 public merkleRoot;
     bool public merkleSet = false;
@@ -111,6 +114,11 @@ contract BasedVitalik is ERC721A, Ownable {
         // Mint number of tokens requested
         _safeMint(msg.sender, numberOfTokens);
 
+        // Update tally if in early access mode
+        if (earlyAccessMode) {
+            earlyAccessMinted[msg.sender] = earlyAccessMinted[msg.sender].add(numberOfTokens);
+        }
+
         // Disable minting if max supply of tokens is reached
         if (totalSupply() == maxSupply) {
             mintingIsActive = false;
@@ -135,7 +143,7 @@ contract BasedVitalik is ERC721A, Ownable {
             // Verify merkle proof
             bytes32 node = keccak256(abi.encodePacked(index, account, whitelistedAmount));
             require(MerkleProof.verify(merkleProof, merkleRoot, node), "Invalid merkle proof.");
-            require(balanceOf(msg.sender).add(numberOfTokens) <= whitelistedAmount, "Cannot exceed amount whitelisted during early access mode.");
+            require(earlyAccessMinted[msg.sender].add(numberOfTokens) <= whitelistedAmount, "Cannot exceed amount whitelisted during early access mode.");
         } else {
             require(numberOfTokens <= maxMints, "Cannot mint more than 30 per tx during public sale.");
         }

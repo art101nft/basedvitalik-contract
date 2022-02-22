@@ -5,10 +5,16 @@ const { expect } = require('chai');
 const { BN, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 const BasedVitalik = artifacts.require('BasedVitalik');
 
-contract('BasedVitalik', function ([owner, other, other2]) {
+contract('BasedVitalik', function ([owner, other, other2, other3]) {
 
   let addresses;
   let proofs;
+  let skipMint;
+  if (process.env.SKIP == 'true') {
+    skipMint = true;
+  } else {
+    skipMint = false;
+  }
   const _buy1 = new BN('30000000000000000');
   const _buy2 = new BN('60000000000000000');
   const _buy3 = new BN('90000000000000000');
@@ -23,6 +29,7 @@ contract('BasedVitalik', function ([owner, other, other2]) {
     let addressesWhitelist = new Object();
     addressesWhitelist[other] = "100";
     addressesWhitelist[other2] = "20";
+    addressesWhitelist[other3] = "10";
 
     fs.writeFileSync(
       "./output.json",
@@ -247,6 +254,43 @@ contract('BasedVitalik', function ([owner, other, other2]) {
       this.bv.mintVitaliks(0, owner, 0, [], 1, {value: _buy1, from: owner}),
       'Invalid merkle proof.',
     );
+    // mint 10 with other3 wallet
+    await this.bv.mintVitaliks(
+      proofs[other3].Index,
+      other3,
+      proofs[other3].Amount,
+      proofs[other3].Proof,
+      10, {value: _buy10, from: other3}
+    );
+    console.log(`[+] Amount minted during whitelist for ${other3}: ${await this.bv.earlyAccessMinted(other3)}`)
+    // transfer all 10 to other wallet
+    for (i = 1; i < 11; i++) {
+      await this.bv.transferFrom(other3, other2, i, {from: other3});
+      console.log(`[+] Transferred tokenID ${i} from ${other3} to ${other2}. New balance is ${await this.bv.balanceOf(other3)}`)
+    }
+    await expect(
+      (await this.bv.totalSupply()).toString()
+    ).to.equal('11');
+    console.log(`[+] Amount minted during whitelist for ${other3} despite transferring: ${await this.bv.earlyAccessMinted(other3)}`)
+    // mint 10 more with other3 wallet - should fail
+    console.log(`[+] Minting 10 more vitaliks to ${other3} despite transferring should fail`);
+    await expectRevert(
+      this.bv.mintVitaliks(
+        proofs[other3].Index,
+        other3,
+        proofs[other3].Amount,
+        proofs[other3].Proof,
+        10, {value: _buy10, from: other3}
+      ),
+      'Cannot exceed amount whitelisted during early access mode.',
+    );
+    // still 11 supply, still 10 tracked for other3 wallet
+    await expect(
+      (await this.bv.totalSupply()).toString()
+    ).to.equal('11');
+    await expect(
+      (await this.bv.earlyAccessMinted(other3)).toString()
+    ).to.equal('10');
   });
 
   it('minting works', async function () {
@@ -303,24 +347,26 @@ contract('BasedVitalik', function ([owner, other, other2]) {
     await expect(
       await this.bv.earlyAccessMode()
     ).to.equal(false);
-    // Mint all 4962
-    for (i = 0; i < 165; i++) {
-      await this.bv.mintVitaliks(0, other, 0, [], 30, {value: _buy30, from: other});
+    if (!skipMint) {
+      // Mint all 4962
+      for (i = 0; i < 165; i++) {
+        await this.bv.mintVitaliks(0, other, 0, [], 30, {value: _buy30, from: other});
+      }
+      await this.bv.mintVitaliks(0, other, 0, [], 6, {value: _buy6, from: other});
+      await this.bv.mintVitaliks(0, other, 0, [], 6, {value: _buy6, from: other});
+      await expect(
+        (await this.bv.totalSupply()).toString()
+      ).to.equal('4962');
+      // Minting should no longer be active
+      await expect(
+        await this.bv.mintingIsActive()
+      ).to.equal(false);
+      // Should not be able to mint more
+      await expectRevert(
+        this.bv.mintVitaliks(0, other, 0, [], 1, {value: _buy1, from: other}),
+        'Minting is not active.',
+      );
     }
-    await this.bv.mintVitaliks(0, other, 0, [], 6, {value: _buy6, from: other});
-    await this.bv.mintVitaliks(0, other, 0, [], 6, {value: _buy6, from: other});
-    await expect(
-      (await this.bv.totalSupply()).toString()
-    ).to.equal('4962');
-    // Minting should no longer be active
-    await expect(
-      await this.bv.mintingIsActive()
-    ).to.equal(false);
-    // Should not be able to mint more
-    await expectRevert(
-      this.bv.mintVitaliks(0, other, 0, [], 1, {value: _buy1, from: other}),
-      'Minting is not active.',
-    );
   })
 
 
