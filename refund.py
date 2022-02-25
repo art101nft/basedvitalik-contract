@@ -57,10 +57,10 @@ with open('export-0xea2dc6f116a4c3d6a15f06b4e8ad582a07c3dd9c.csv', mode='r')as f
                 totals[to_address] = 0
             totals[to_address] += amt_wei
             gas = 21000
-            # nonce = w3.eth.get_transaction_count(from_address)
-            nonce = 0
-            # gas_price = w3.eth.gas_price
-            gas_price = w3.toWei(80, 'gwei')
+            nonce = w3.eth.get_transaction_count(from_address)
+            # nonce = 0
+            gas_price = w3.eth.gas_price + 10000000000
+            # gas_price = w3.toWei(80, 'gwei')
             gas_price_gwei = w3.fromWei(gas_price, 'gwei')
             tx_dict = {
                 'to': to_address,
@@ -73,33 +73,34 @@ with open('export-0xea2dc6f116a4c3d6a15f06b4e8ad582a07c3dd9c.csv', mode='r')as f
             }
             print(f'[+] Refunding {amt_eth} ETH to {shorten(to_address)} at {gas_price_gwei} gwei and nonce {nonce} for mint tx {shorten(tx_hash)}')
             # break
-            # sleep(1)
-            # signed_tx = eth_account.sign_transaction(tx_dict)
-            # res = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
-            # refund_hash = res.hex()
-            # with open('sent.log', 'a') as f:
-            #     f.write(f'{tx_hash} {refund_hash}\n')
-            # try:
-            #     sleep(30)
-            #     tx_receipt = w3.eth.wait_for_transaction_receipt(refund_hash, timeout=600, poll_latency=15)
-            #     tx_status = tx_receipt['status'] == 1
-            #     if not tx_status:
-            #         print(f'[ethereum_tx] Tx {refund_hash} failed')
-            #         raise Exception('TX failed')
-            #     print(f'[+] Payout details updated for tx {eth_tx.tx_hash}')
-            # except TransactionNotFound:
-            #     print('[!] That transaction does not exist')
-            #     raise Exception('TX failed')
-            # except TimeExhausted:
-            #     print('[!] Time has exhausted on this send')
-            #     raise Exception('TX failed')
-            # except Exception as e:
-            #     print(f'[!] {e}')
-            #     raise Exception('TX failed')
+            signed_tx = eth_account.sign_transaction(tx_dict)
+            res = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+            refund_hash = res.hex()
+            with open('sent.log', 'a') as f:
+                f.write(f'{tx_hash} {refund_hash}\n')
+            try:
+                sleep(30)
+                tx_receipt = w3.eth.wait_for_transaction_receipt(refund_hash, timeout=600, poll_latency=15)
+                tx_status = tx_receipt['status'] == 1
+                if not tx_status:
+                    print(f'[ethereum_tx] Tx {refund_hash} failed')
+                    raise Exception('TX failed')
+                print(f'[+] Payout details updated for tx {eth_tx.tx_hash}')
+            except TransactionNotFound:
+                print('[!] That transaction does not exist')
+                raise Exception('TX failed')
+            except TimeExhausted:
+                print('[!] Time has exhausted on this send')
+                raise Exception('TX failed')
+            except Exception as e:
+                print(f'[!] {e}')
+                raise Exception('TX failed')
+            sleep(12)
+            break
 
-    for i in totals:
-        totals['eth_wei'] += totals[i]
-        totals[i] = float(w3.fromWei(totals[i], 'ether'))
-
-    totals['eth'] = w3.fromWei(totals['eth_wei'], 'ether')
-    print(totals['eth'])
+    # for i in totals:
+    #     totals['eth_wei'] += totals[i]
+    #     totals[i] = float(w3.fromWei(totals[i], 'ether'))
+    #
+    # totals['eth'] = w3.fromWei(totals['eth_wei'], 'ether')
+    # print(totals['eth'])
