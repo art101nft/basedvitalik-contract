@@ -1,4 +1,4 @@
-const newURI = 'ipfs://Qma5YMe5ED2wrrma7KDBNMPHLHHziKudjekSNQPc3dEyka/'; // carty's new meta
+const newURI = 'ipfs://QmQX8hPac73HpdzBFVRghHJxiGnpB3bn9UERTnaGvJVswV/'; // revealed 0-600
 
 module.exports = async function main(callback) {
   try {
