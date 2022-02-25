@@ -9,3 +9,4 @@ package-lock.json
 output.json
 addr-to-claim.json
 proofs.json
+.venv
