@@ -43,7 +43,11 @@ with open('export-0xea2dc6f116a4c3d6a15f06b4e8ad582a07c3dd9c.csv', mode='r')as f
     for lines in csv_file:
         tx_hash = lines['Txhash']
         refund_address = lines['From']
-        skip = ['0x482979F11f17C853f3A526A28d5D9381Cd8aa635']
+        skip = [
+            '0x482979F11f17C853f3A526A28d5D9381Cd8aa635', #carty
+            '0x653D2d1D10c79017b2eA5F5a6F02D9Ab6e725395', #lance
+            '0x4f783a3F1192dB0ae0d06c3554B767Dfc75F144e', #john
+        ]
         if lines['Method'] == _m and lines['Status'] == '' and tx_hash not in open('sent.log').read() and refund_address not in skip:
             amt_eth = float(lines["Value_IN(ETH)"])
             amt_wei = w3.toWei(amt_eth, 'ether')
@@ -73,6 +77,7 @@ with open('export-0xea2dc6f116a4c3d6a15f06b4e8ad582a07c3dd9c.csv', mode='r')as f
             }
             print(f'[+] Refunding {amt_eth} ETH to {shorten(to_address)} at {round(gas_price_gwei, 3)} gwei and nonce {nonce} for mint tx {shorten(tx_hash)}')
             # break
+            print('sleeping...')
             sleep(12)
             signed_tx = eth_account.sign_transaction(tx_dict)
             res = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
@@ -96,6 +101,7 @@ with open('export-0xea2dc6f116a4c3d6a15f06b4e8ad582a07c3dd9c.csv', mode='r')as f
             except Exception as e:
                 print(f'[!] {e}')
                 raise Exception('TX failed')
+            print('sleeping...\n\n')
             sleep(12)
             break
 
