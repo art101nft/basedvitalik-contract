@@ -1,4 +1,4 @@
-const newPrice = '60000000000000000'; // .06
+const newPrice = '0'; // free
 
 module.exports = async function main(callback) {
   try {
