@@ -19,7 +19,7 @@ module.exports = {
       gasPrice: 2000000000 // 2 gwei
     },
     mainnet: {
-      provider: () => new HDWalletProvider(process.env.MNEMONIC, "https://mainnet.infura.io/v3/" + process.env.INFURA_PID),
+      provider: () => new HDWalletProvider(process.env.MNEMONIC, "https://eth.getblock.io/mainnet/?api_key=" + process.env.INFURA_PID),
       network_id: 1,
       confirmations: 3,
       timeoutBlocks: 30,

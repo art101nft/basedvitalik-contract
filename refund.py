@@ -14,7 +14,7 @@ load_dotenv()
 
 # web3 providers and network details
 INFURA_PID = environ['INFURA_PID']
-WEB3_PROVIDER_URI = f'https://mainnet.infura.io/v3/{INFURA_PID}'
+WEB3_PROVIDER_URI = f'https://eth.getblock.io/mainnet/?api_key={INFURA_PID}'
 w3 = Web3(Web3.HTTPProvider(WEB3_PROVIDER_URI))
 
 def shorten(s):
@@ -42,11 +42,11 @@ with open('export-0xea2dc6f116a4c3d6a15f06b4e8ad582a07c3dd9c.csv', mode='r')as f
     _m = '0xe366c9ca'
     for lines in csv_file:
         tx_hash = lines['Txhash']
-        refund_address = lines['From']
+        refund_address = lines['From'].lower()
         skip = [
-            '0x482979F11f17C853f3A526A28d5D9381Cd8aa635', #carty
-            '0x653D2d1D10c79017b2eA5F5a6F02D9Ab6e725395', #lance
-            '0x4f783a3F1192dB0ae0d06c3554B767Dfc75F144e', #john
+            '0x482979F11f17C853f3A526A28d5D9381Cd8aa635'.lower(), #carty
+            '0x653D2d1D10c79017b2eA5F5a6F02D9Ab6e725395'.lower(), #lance
+            '0x4f783a3F1192dB0ae0d06c3554B767Dfc75F144e'.lower(), #john
         ]
         if lines['Method'] == _m and lines['Status'] == '' and tx_hash not in open('sent.log').read() and refund_address not in skip:
             amt_eth = float(lines["Value_IN(ETH)"])
@@ -78,32 +78,32 @@ with open('export-0xea2dc6f116a4c3d6a15f06b4e8ad582a07c3dd9c.csv', mode='r')as f
             print(f'[+] Refunding {amt_eth} ETH to {shorten(to_address)} at {round(gas_price_gwei, 3)} gwei and nonce {nonce} for mint tx {shorten(tx_hash)}')
             # break
             print('sleeping...')
-            sleep(12)
-            signed_tx = eth_account.sign_transaction(tx_dict)
-            res = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
-            refund_hash = res.hex()
-            with open('sent.log', 'a') as f:
-                f.write(f'{tx_hash} {refund_hash}\n')
-            try:
-                sleep(24)
-                tx_receipt = w3.eth.wait_for_transaction_receipt(refund_hash, timeout=600, poll_latency=15)
-                tx_status = tx_receipt['status'] == 1
-                if not tx_status:
-                    print(f'[!] Tx {refund_hash} failed')
-                    raise Exception('TX failed')
-                print(f'[+] Payout details updated for tx {eth_tx.tx_hash}')
-            except TransactionNotFound:
-                print('[!] That transaction does not exist')
-                raise Exception('TX failed')
-            except TimeExhausted:
-                print('[!] Time has exhausted on this send')
-                raise Exception('TX failed')
-            except Exception as e:
-                print(f'[!] {e}')
-                raise Exception('TX failed')
-            print('sleeping...\n\n')
-            sleep(12)
-            break
+            # sleep(12)
+            # signed_tx = eth_account.sign_transaction(tx_dict)
+            # res = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+            # refund_hash = res.hex()
+            # with open('sent.log', 'a') as f:
+            #     f.write(f'{tx_hash} {refund_hash}\n')
+            # try:
+            #     sleep(24)
+            #     tx_receipt = w3.eth.wait_for_transaction_receipt(refund_hash, timeout=600, poll_latency=15)
+            #     tx_status = tx_receipt['status'] == 1
+            #     if not tx_status:
+            #         print(f'[!] Tx {refund_hash} failed')
+            #         raise Exception('TX failed')
+            #     print(f'[+] Payout details updated for tx {eth_tx.tx_hash}')
+            # except TransactionNotFound:
+            #     print('[!] That transaction does not exist')
+            #     raise Exception('TX failed')
+            # except TimeExhausted:
+            #     print('[!] Time has exhausted on this send')
+            #     raise Exception('TX failed')
+            # except Exception as e:
+            #     print(f'[!] {e}')
+            #     raise Exception('TX failed')
+            # print('sleeping...\n\n')
+            # sleep(12)
+            # break
 
     # for i in totals:
     #     totals['eth_wei'] += totals[i]
