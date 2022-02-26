@@ -14,7 +14,7 @@ load_dotenv()
 
 # web3 providers and network details
 INFURA_PID = environ['INFURA_PID']
-WEB3_PROVIDER_URI = f'https://eth.getblock.io/mainnet/?api_key={INFURA_PID}'
+WEB3_PROVIDER_URI = f'https://mainnet.infura.io/v3/{INFURA_PID}'
 w3 = Web3(Web3.HTTPProvider(WEB3_PROVIDER_URI))
 
 def shorten(s):
