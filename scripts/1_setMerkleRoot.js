@@ -1,4 +1,4 @@
-const newMerkleRoot = '0xb57718b579f31cd59f3025aad8e9c7a706086a7ca72750958c4b47ac1b29dc81'; // mainnet, v3 WL feb22 4:11 PM
+const newMerkleRoot = '0x8501da64f72c51f13cbd97fa98a4e0920edf32585ae8dcf7e24731e32aabbefc'; // mainnet, v4 WL feb27 11:34 PM
 
 module.exports = async function main(callback) {
   try {
