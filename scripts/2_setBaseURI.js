@@ -1,4 +1,4 @@
-const newURI = 'ipfs://QmQX8hPac73HpdzBFVRghHJxiGnpB3bn9UERTnaGvJVswV/'; // revealed 0-600
+const newURI = 'ipfs://QmeUkcBzmcZecrdwudLiL7e5bYR9KBz2M2dEd974EYKk9s/'; // all revealed
 
 module.exports = async function main(callback) {
   try {
