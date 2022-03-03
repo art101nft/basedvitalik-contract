@@ -1,4 +1,4 @@
-const newURI = 'ipfs://QmdPiAzucMaKYAbdWN5m38uxHp1trHwt4pqbQrCSNvgJfp/'; // all revealed, meta fixes march 2
+const newURI = 'ipfs://QmYT7fDqx9u98AhFRiXUyrhgEurhrNcRgC2pGhpFLfETaA/'; // all revealed, meta fixes march 2, evening
 
 module.exports = async function main(callback) {
   try {
